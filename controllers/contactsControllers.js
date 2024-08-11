@@ -4,54 +4,51 @@ import {
 } from "../schemas/contactsSchemas.js";
 import {
   addContact,
+  getContactById,
   listContacts,
   removeContact,
   updateContactFile,
+  updateStatusContact,
 } from "../services/contactsServices.js";
 
-export const getAllContacts = (req, res) => {
-  listContacts().then((data) => {
+export const getAllContacts = async (req, res) => {
+  res.status(200).json({
+    contacts: await listContacts(),
+  });
+};
+
+export const getOneContact = async (req, res) => {
+  const { id } = req.params;
+  const contact = await getContactById(id);
+  if (contact) {
     res.status(200).json({
-      contacts: data,
+      contact: contact,
     });
-  });
+    return;
+  }
+  res.status(404).json({ message: "Not found" });
 };
 
-export const getOneContact = (req, res) => {
+export const deleteContact = async (req, res) => {
   const { id } = req.params;
-  listContacts().then((data) => {
-    const contact = data.find((el) => el.id === id);
-    if (contact) {
-      res.status(200).json({
-        contact: contact,
-      });
-      return;
-    }
-    res.status(404).json({ message: "Not found" });
-  });
+  const contact = await removeContact(id);
+  if (contact != null) {
+    res.status(200).json({
+      contact: contact,
+    });
+    return;
+  }
+  res.status(404).json({ message: "Not found" });
 };
 
-export const deleteContact = (req, res) => {
-  const { id } = req.params;
-  removeContact(id).then((data) => {
-    if (data != null) {
-      res.status(200).json({
-        contact: data,
-      });
-      return;
-    }
-    res.status(404).json({ message: "Not found" });
-  });
-};
-
-export const createContact = (req, res) => {
+export const createContact = async (req, res) => {
   try {
     const validate = createContactSchema.validate(req.body);
     if (!validate.error) {
-      const { name, email, phone } = validate.value;
-      addContact(name, email, phone).then((data) =>
-        res.status(201).json({ contact: data })
-      );
+      const { name, email, phone, favorite } = validate.value;
+      const newContact = await addContact({ name, email, phone, favorite });
+      console.log(newContact);
+      res.status(201).json({ contact: newContact });
       return;
     }
     throw validate.error;
@@ -60,27 +57,41 @@ export const createContact = (req, res) => {
   }
 };
 
-export const updateContact = (req, res) => {
+export const updateContact = async (req, res) => {
   const { id } = req.params;
-  if (req.body) {
-    try {
-      const validate = updateContactSchema.validate(req.body);
-      console.log(validate);
-      if (!validate.error) {
-        const { name, email, phone } = validate.value;
-        updateContactFile(id, name, email, phone).then((data) => {
-          if (data != null) {
-            res.status(200).json({ contact: data });
-            return;
-          }
-          res.status(404).json({ message: "Not found" });
-        });
+  try {
+    const validate = updateContactSchema.validate(req.body);
+    if (!validate.error) {
+      const { name, email, phone, favorite } = validate.value;
+      const contact = await updateContactFile({
+        id,
+        name,
+        email,
+        phone,
+        favorite,
+      });
+      if (contact != null) {
+        res.status(200).json({ contact: contact });
         return;
       }
-      throw validate.error;
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(404).json({ message: "Not found" });
+      return;
     }
+    throw validate.error;
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-  res.status(400).json({ message: "Body must have at least one field" });
+};
+
+export const favoriteContact = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (req.body.favorite === undefined) {
+      throw { message: "Not found: favorite, in body" };
+    }
+    await updateStatusContact(id, req.body);
+    res.status(200).send();
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };

@@ -48,7 +48,7 @@ export async function updateContactFile({ id, name, email, phone, favorite }) {
   try {
     return await update({ id, name, email, phone, favorite });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return null;
   }
 }
@@ -57,6 +57,6 @@ export async function updateStatusContact(id, body) {
   try {
     return await updateStatus(id, body);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

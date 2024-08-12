@@ -12,4 +12,4 @@ export const updateContactSchema = Joi.object({
   email: Joi.string().email(),
   phone: Joi.string().min(10),
   favorite: Joi.boolean(),
-});
+}).or("name", "email", "phone", "favorite");

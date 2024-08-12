@@ -8,55 +8,25 @@ import {
 } from "../db/MongoDB.js";
 
 export async function listContacts() {
-  try {
-    return await getAll();
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
+  return await getAll();
 }
 
 export async function getContactById(contactId) {
-  try {
-    return await getById({ id: contactId });
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+  return await getById({ id: contactId });
 }
 
 export async function removeContact(contactId) {
-  try {
-    const contact = await remove({ id: contactId });
-    return contact;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+  return await remove({ id: contactId });
 }
 
 export async function addContact({ name, email, phone, favorite }) {
-  try {
-    return await add({ name, email, phone, favorite });
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+  return await add({ name, email, phone, favorite });
 }
 
 export async function updateContactFile({ id, name, email, phone, favorite }) {
-  try {
-    return await update({ id, name, email, phone, favorite });
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+  return await update({ id, name, email, phone, favorite });
 }
 
 export async function updateStatusContact(id, body) {
-  try {
-    return await updateStatus(id, body);
-  } catch (err) {
-    console.error(err);
-  }
+  return await updateStatus(id, body);
 }

@@ -22,7 +22,7 @@ export const getAllContacts = async (req, res, next) => {
   }
 };
 
-export const getOneContact = async (req, res, err) => {
+export const getOneContact = async (req, res, next) => {
   const { id } = req.params;
   try {
     const contact = await getContactById(id);
@@ -33,7 +33,8 @@ export const getOneContact = async (req, res, err) => {
       contact: contact,
     });
   } catch (err) {
-    next(err);
+    if (err.kind) next(new ApiError(404, "Not found"));
+    else next(err);
   }
 };
 

@@ -18,9 +18,9 @@ usersRouter.post(
 );
 
 usersRouter.post(
-  "logout",
+  "/logout",
   verifyToken,
-  async () => await asyncTryCatchWrapper(logout, [req, res, next])
+  async (req, res, next) => await asyncTryCatchWrapper(logout, [req, res, next])
 );
 
 export default usersRouter;

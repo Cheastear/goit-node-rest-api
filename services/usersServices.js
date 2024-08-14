@@ -11,3 +11,11 @@ export const getByEmail = async ({ email }) => {
 export const addUser = async ({ email, hashedPassword }) => {
   return await User.create({ email, password: hashedPassword });
 };
+
+export const addToken = async ({ id, token }) => {
+  return await User.findOneAndUpdate({ _id: id }, { token });
+};
+
+export const removeToken = async ({ id }) => {
+  return await User.findOneAndUpdate({ _id: id }, { token: "" });
+};

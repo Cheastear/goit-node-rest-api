@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
+import passport from "passport";
 import "dotenv/config";
 import "./utils/Strategy.js";
 
@@ -10,6 +11,7 @@ import usersRouter from "./routes/usersRouter.js";
 
 const app = express();
 
+app.use(passport.initialize());
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());

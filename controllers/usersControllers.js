@@ -82,9 +82,20 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  const user = removeToken({ id: req.user._id });
+  const user = await removeToken({ id: req.user._id });
 
   if (!user) throw new ApiError(401, { message: "Unauthorized" });
 
   res.status(204).send();
+};
+
+export const current = async (req, res) => {
+  const user = await getById({ id: req.user._id });
+
+  if (!user) throw new ApiError(401, { message: "Unauthorized" });
+
+  res.status(200).json({
+    email: user.email,
+    subscription: user.subscription,
+  });
 };

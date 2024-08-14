@@ -1,7 +1,12 @@
 import express from "express";
 
 import asyncTryCatchWrapper from "../utils/tryCatchWrapper.js";
-import { register, login, logout } from "../controllers/usersControllers.js";
+import {
+  register,
+  login,
+  logout,
+  current,
+} from "../controllers/usersControllers.js";
 import verifyToken from "../utils/verifyToken.js";
 
 const usersRouter = express.Router();
@@ -21,6 +26,13 @@ usersRouter.post(
   "/logout",
   verifyToken,
   async (req, res, next) => await asyncTryCatchWrapper(logout, [req, res, next])
+);
+
+usersRouter.get(
+  "/current",
+  verifyToken,
+  async (req, res, next) =>
+    await asyncTryCatchWrapper(current, [req, res, next])
 );
 
 export default usersRouter;

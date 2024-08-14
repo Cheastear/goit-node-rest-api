@@ -1,7 +1,11 @@
 import Contact from "../schemas/requestSchema.js";
 
-export async function listContacts({ owner }) {
-  return await Contact.find({ owner });
+export async function getCountDocuments() {
+  return await Contact.countDocuments();
+}
+
+export async function listContacts(query, { skip, limit }) {
+  return await Contact.find(query).skip(skip).limit(limit).exec();
 }
 
 export async function getContactById({ id, owner }) {

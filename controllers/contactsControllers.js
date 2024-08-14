@@ -1,3 +1,4 @@
+import { query } from "express";
 import {
   createContactSchema,
   updateContactSchema,
@@ -5,6 +6,7 @@ import {
 import {
   addContact,
   getContactById,
+  getCountDocuments,
   listContacts,
   removeContact,
   updateContactFile,
@@ -13,9 +15,23 @@ import {
 import ApiError from "../utils/ApiError.js";
 
 export const getAllContacts = async (req, res) => {
+  const { page = 1, limit = 20, favorite } = req.query;
+  const skip = (page - 1) * limit;
+
+  const query = {
+    owner: req.user._id,
+  };
+  if (favorite) {
+    query.favorite = favorite === "true";
+  }
+
   res.status(200).json({
-    contacts: await listContacts({
-      owner: req.user._id,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    totalCount: await getCountDocuments(),
+    contacts: await listContacts(query, {
+      skip: parseInt(skip),
+      limit: parseInt(limit),
     }),
   });
 };

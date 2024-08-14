@@ -19,3 +19,11 @@ export const addToken = async ({ id, token }) => {
 export const removeToken = async ({ id }) => {
   return await User.findOneAndUpdate({ _id: id }, { token: "" });
 };
+
+export const subscriptionUpdate = async ({ id, subscription }) => {
+  return await User.findOneAndUpdate(
+    { _id: id },
+    { subscription },
+    { new: true }
+  );
+};

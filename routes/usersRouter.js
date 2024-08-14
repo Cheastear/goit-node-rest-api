@@ -6,6 +6,7 @@ import {
   login,
   logout,
   current,
+  subscription,
 } from "../controllers/usersControllers.js";
 import verifyToken from "../utils/verifyToken.js";
 
@@ -33,6 +34,13 @@ usersRouter.get(
   verifyToken,
   async (req, res, next) =>
     await asyncTryCatchWrapper(current, [req, res, next])
+);
+
+usersRouter.patch(
+  "/",
+  verifyToken,
+  async (req, res, next) =>
+    await asyncTryCatchWrapper(subscription, [req, res, next])
 );
 
 export default usersRouter;

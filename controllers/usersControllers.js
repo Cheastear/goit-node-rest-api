@@ -7,6 +7,7 @@ import {
   getByEmail,
   getById,
   removeToken,
+  subscriptionUpdate,
 } from "../services/usersServices.js";
 import ApiError from "../utils/ApiError.js";
 import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
@@ -93,6 +94,25 @@ export const current = async (req, res) => {
   const user = await getById({ id: req.user._id });
 
   if (!user) throw new ApiError(401, { message: "Unauthorized" });
+
+  res.status(200).json({
+    email: user.email,
+    subscription: user.subscription,
+  });
+};
+
+export const subscription = async (req, res) => {
+  const { subscription } = req.body;
+
+  const allowedSubscriptions = ["starter", "pro", "business"];
+  if (!allowedSubscriptions.includes(subscription))
+    throw new ApiError(400, { message: "Invalid subscription value" });
+
+  const user = await subscriptionUpdate({ id: req.user._id, subscription });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
   res.status(200).json({
     email: user.email,

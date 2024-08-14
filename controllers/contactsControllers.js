@@ -1,7 +1,7 @@
 import {
   createContactSchema,
   updateContactSchema,
-} from "../schemas/contactsSchemas.js";
+} from "../schemas/contactsValidateSchemas.js";
 import {
   addContact,
   getContactById,
@@ -14,16 +14,21 @@ import ApiError from "../utils/ApiError.js";
 
 export const getAllContacts = async (req, res) => {
   res.status(200).json({
-    contacts: await listContacts(),
+    contacts: await listContacts({
+      owner: req.user._id,
+    }),
   });
 };
 
 export const getOneContact = async (req, res) => {
   const { id } = req.params;
-  const contact = await getContactById(id);
-  if (!contact) {
-    throw new ApiError(404, "Not found");
-  }
+  const contact = await getContactById({
+    id,
+    owner: req.user._id,
+  });
+
+  if (!contact) throw new ApiError(404, "Not found");
+
   res.status(200).json({
     contact: contact,
   });
@@ -31,10 +36,13 @@ export const getOneContact = async (req, res) => {
 
 export const deleteContact = async (req, res) => {
   const { id } = req.params;
-  const contact = await removeContact(id);
-  if (!contact) {
-    throw new ApiError(404, "Not found");
-  }
+  const contact = await removeContact({
+    id,
+    owner: req.user._id,
+  });
+
+  if (!contact) throw new ApiError(404, "Not found");
+
   res.status(200).json({
     contact: contact,
   });
@@ -42,39 +50,47 @@ export const deleteContact = async (req, res) => {
 
 export const createContact = async (req, res) => {
   const validate = createContactSchema.validate(req.body);
-  if (validate.error) {
-    throw new ApiError(400, validate.error.message);
-  }
+
+  if (validate.error) throw new ApiError(400, validate.error.message);
+
   const { name, email, phone, favorite } = validate.value;
-  const newContact = await addContact({ name, email, phone, favorite });
+  const newContact = await addContact({
+    name,
+    email,
+    phone,
+    favorite,
+    owner: req.user._id,
+  });
   res.status(201).json({ contact: newContact });
 };
 
 export const updateContact = async (req, res) => {
   const { id } = req.params;
   const validate = updateContactSchema.validate(req.body);
-  if (validate.error) {
-    throw new ApiError(400, validate.error.message);
-  }
+
+  if (validate.error) throw new ApiError(400, validate.error.message);
+
   const { name, email, phone, favorite } = validate.value;
   const contact = await updateContactFile({
     id,
+    owner: req.user._id,
     name,
     email,
     phone,
     favorite,
   });
-  if (!contact) {
-    throw new ApiError(404, "Not found");
-  }
+
+  if (!contact) throw new ApiError(404, "Not found");
+
   res.status(200).json({ contact: contact });
 };
 
 export const favoriteContact = async (req, res) => {
   const { id } = req.params;
-  if (req.body.favorite === undefined) {
+
+  if (req.body.favorite === undefined)
     throw new ApiError(400, "Not found: favorite, in body");
-  }
-  await updateStatusContact(id, req.body);
+
+  await updateStatusContact({ id, owner: req.user._id }, req.body);
   res.status(200).send();
 };

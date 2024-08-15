@@ -13,40 +13,15 @@ import verifyToken from "../utils/verifyToken.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get(
-  "/",
-  verifyToken,
-  async (req, res, next) =>
-    await asyncTryCatchWrapper(getAllContacts, [req, res, next])
-);
+contactsRouter.get("/", verifyToken, asyncTryCatchWrapper(getAllContacts));
 
-contactsRouter.get(
-  "/:id",
-  verifyToken,
-  async (req, res, next) =>
-    await asyncTryCatchWrapper(getOneContact, [req, res, next])
-);
+contactsRouter.get("/:id", verifyToken, asyncTryCatchWrapper(getOneContact));
 
-contactsRouter.delete(
-  "/:id",
-  verifyToken,
-  async (req, res, next) =>
-    await asyncTryCatchWrapper(deleteContact, [req, res, next])
-);
+contactsRouter.delete("/:id", verifyToken, asyncTryCatchWrapper(deleteContact));
 
-contactsRouter.post(
-  "/",
-  verifyToken,
-  async (req, res, next) =>
-    await asyncTryCatchWrapper(createContact, [req, res, next])
-);
+contactsRouter.post("/", verifyToken, asyncTryCatchWrapper(createContact));
 
-contactsRouter.put(
-  "/:id",
-  verifyToken,
-  async (req, res, next) =>
-    await asyncTryCatchWrapper(updateContact, [req, res, next])
-);
+contactsRouter.put("/:id", verifyToken, asyncTryCatchWrapper(updateContact));
 
 contactsRouter.patch(
   "/:id/favorite",

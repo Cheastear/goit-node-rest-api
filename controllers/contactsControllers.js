@@ -1,7 +1,6 @@
-import { query } from "express";
 import {
-  createContactSchema,
-  updateContactSchema,
+  createContactValidator,
+  updateContactValidator,
 } from "../schemas/contactsValidateSchemas.js";
 import {
   addContact,
@@ -28,7 +27,7 @@ export const getAllContacts = async (req, res) => {
   res.status(200).json({
     page: parseInt(page),
     limit: parseInt(limit),
-    totalCount: await getCountDocuments(),
+    totalCount: await getCountDocuments(query),
     contacts: await listContacts(query, {
       skip: parseInt(skip),
       limit: parseInt(limit),
@@ -67,14 +66,7 @@ export const deleteContact = async (req, res) => {
 export const createContact = async (req, res) => {
   const { name, email, phone, favorite } = req.body;
 
-  const validate = createContactSchema.validate({
-    name,
-    email,
-    phone,
-    favorite,
-  });
-
-  if (validate.error) throw new ApiError(400, validate.error.message);
+  await createContactValidator(req.body);
 
   const newContact = await addContact({
     name,
@@ -90,14 +82,7 @@ export const updateContact = async (req, res) => {
   const { id } = req.params;
   const { name, email, phone, favorite } = req.body;
 
-  const validate = updateContactSchema.validate({
-    name,
-    email,
-    phone,
-    favorite,
-  });
-
-  if (validate.error) throw new ApiError(400, validate.error.message);
+  await updateContactValidator(req.body);
 
   const contact = await updateContactFile({
     id,

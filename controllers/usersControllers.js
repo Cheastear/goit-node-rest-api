@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-import { userValidateSchema } from "../schemas/userValidateSchema.js";
+import { userValidator } from "../schemas/userValidateSchema.js";
 import {
   addToken,
   addUser,
@@ -15,9 +15,7 @@ import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
 export const register = async (req, res) => {
   const { password, email } = req.body;
 
-  const validate = userValidateSchema.validate({ password, email });
-
-  if (validate.error) throw new ApiError(400, validate.error.message);
+  await userValidator(req.body);
 
   const existedUser = await getByEmail({ email });
 
@@ -52,9 +50,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const validate = userValidateSchema.validate({ email, password });
-
-  if (validate.error) throw new ApiError(400, validate.error.message);
+  await userValidator(req.body);
 
   const user = await getByEmail({ email });
 

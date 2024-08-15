@@ -1,7 +1,7 @@
 import Contact from "../schemas/requestSchema.js";
 
-export async function getCountDocuments() {
-  return await Contact.countDocuments();
+export async function getCountDocuments(query) {
+  return await Contact.countDocuments(query);
 }
 
 export async function listContacts(query, { skip, limit }) {

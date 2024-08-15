@@ -65,11 +65,17 @@ export const deleteContact = async (req, res) => {
 };
 
 export const createContact = async (req, res) => {
-  const validate = createContactSchema.validate(req.body);
+  const { name, email, phone, favorite } = req.body;
+
+  const validate = createContactSchema.validate({
+    name,
+    email,
+    phone,
+    favorite,
+  });
 
   if (validate.error) throw new ApiError(400, validate.error.message);
 
-  const { name, email, phone, favorite } = validate.value;
   const newContact = await addContact({
     name,
     email,
@@ -82,11 +88,17 @@ export const createContact = async (req, res) => {
 
 export const updateContact = async (req, res) => {
   const { id } = req.params;
-  const validate = updateContactSchema.validate(req.body);
+  const { name, email, phone, favorite } = req.body;
+
+  const validate = updateContactSchema.validate({
+    name,
+    email,
+    phone,
+    favorite,
+  });
 
   if (validate.error) throw new ApiError(400, validate.error.message);
 
-  const { name, email, phone, favorite } = validate.value;
   const contact = await updateContactFile({
     id,
     owner: req.user._id,

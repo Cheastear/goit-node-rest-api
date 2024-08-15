@@ -13,11 +13,11 @@ import ApiError from "../utils/ApiError.js";
 import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
 
 export const register = async (req, res) => {
-  const validate = userValidateSchema.validate(req.body);
+  const { password, email } = req.body;
+
+  const validate = userValidateSchema.validate({ password, email });
 
   if (validate.error) throw new ApiError(400, validate.error.message);
-
-  const { password, email } = req.body;
 
   const existedUser = await getByEmail({ email });
 
@@ -50,11 +50,11 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const validate = userValidateSchema.validate(req.body);
+  const { email, password } = req.body;
+
+  const validate = userValidateSchema.validate({ email, password });
 
   if (validate.error) throw new ApiError(400, validate.error.message);
-
-  const { email, password } = req.body;
 
   const user = await getByEmail({ email });
 
@@ -85,7 +85,7 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   const user = await removeToken({ id: req.user._id });
 
-  if (!user) throw new ApiError(401, { message: "Unauthorized" });
+  if (!user) throw new ApiError(401, "Unauthorized");
 
   res.status(204).send();
 };
@@ -93,7 +93,7 @@ export const logout = async (req, res) => {
 export const current = async (req, res) => {
   const user = await getById({ id: req.user._id });
 
-  if (!user) throw new ApiError(401, { message: "Unauthorized" });
+  if (!user) throw new ApiError(401, "Unauthorized");
 
   res.status(200).json({
     email: user.email,
@@ -106,7 +106,7 @@ export const subscription = async (req, res) => {
 
   const allowedSubscriptions = ["starter", "pro", "business"];
   if (!allowedSubscriptions.includes(subscription))
-    throw new ApiError(400, { message: "Invalid subscription value" });
+    throw new ApiError(400, "Invalid subscription value");
 
   const user = await subscriptionUpdate({ id: req.user._id, subscription });
 

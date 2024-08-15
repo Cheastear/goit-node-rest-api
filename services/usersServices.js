@@ -17,7 +17,7 @@ export const addToken = async ({ id, token }) => {
 };
 
 export const removeToken = async ({ id }) => {
-  return await User.findOneAndUpdate({ _id: id }, { token: "" });
+  return await User.findOneAndUpdate({ _id: id }, { token: null });
 };
 
 export const subscriptionUpdate = async ({ id, subscription }) => {

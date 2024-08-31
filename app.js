@@ -4,10 +4,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import passport from "passport";
 import "dotenv/config";
-import "./utils/Strategy.js";
 
 import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
+import { avatarPathFrom, avatarPathTo } from "./multer/userAvatars.js";
+import createFolderIsNotExist from "./utils/createFolderIsNotExist.js";
+import "./utils/Strategy.js";
+import avatarRouter from "./routes/avatarRouter.js";
 
 const app = express();
 
@@ -16,6 +19,7 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
+app.use("/", avatarRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/contacts", contactsRouter);
 
@@ -36,6 +40,8 @@ const connection = mongoose.connect(uriDb);
 connection
   .then(() => {
     console.log("Database connection successful");
+    createFolderIsNotExist(avatarPathFrom);
+    createFolderIsNotExist(avatarPathTo);
     app.listen(PORT, () => {
       console.log(`Server is running. Use our API on port: ${PORT}`);
     });

@@ -1,4 +1,5 @@
 import Joi from "joi";
+import ApiError from "../utils/ApiError.js";
 
 const userValidateSchema = Joi.object({
   email: Joi.string().email().required(),

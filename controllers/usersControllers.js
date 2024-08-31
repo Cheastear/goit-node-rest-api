@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
+import path from "path";
 
 import { userValidator } from "../schemas/userValidateSchema.js";
 import {
@@ -11,6 +13,8 @@ import {
 } from "../services/usersServices.js";
 import ApiError from "../utils/ApiError.js";
 import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
+import { avatarPathTo } from "../multer/userAvatars.js";
+import { rename } from "../services/avatarSchemas.js";
 
 export const register = async (req, res) => {
   const { password, email } = req.body;
@@ -21,9 +25,14 @@ export const register = async (req, res) => {
 
   if (existedUser != null) throw new ApiError(409, "Email is use");
 
+  const avatarFileName = `${await gravatar
+    .url(email)
+    .replace("//www.gravatar.com/avatar/", "")}${".jpeg"}`;
+
   const newUser = await addUser({
     email,
     hashedPassword: await passwordHash(password),
+    avatarURL: avatarFileName,
   });
 
   if (newUser === null) throw new ApiError(500, "Database error");
@@ -114,4 +123,18 @@ export const subscription = async (req, res) => {
     email: user.email,
     subscription: user.subscription,
   });
+};
+
+export const uploadAvatar = async (req, res) => {
+  const { path: temporaryName } = req.file;
+
+  const user = await getById({ id: req.user._id });
+
+  if (!user) throw new ApiError(404, "User not found");
+
+  const fileName = path.join(avatarPathTo, user.avatarURL);
+
+  rename(temporaryName, fileName);
+
+  res.status(200).json({ avatarURL: path.join("/avatars/", user.avatarURL) });
 };

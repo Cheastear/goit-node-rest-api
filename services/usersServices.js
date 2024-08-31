@@ -8,8 +8,8 @@ export const getByEmail = async ({ email }) => {
   return await User.findOne({ email: email });
 };
 
-export const addUser = async ({ email, hashedPassword }) => {
-  return await User.create({ email, password: hashedPassword });
+export const addUser = async ({ email, hashedPassword, avatarURL }) => {
+  return await User.create({ email, password: hashedPassword, avatarURL });
 };
 
 export const addToken = async ({ id, token }) => {

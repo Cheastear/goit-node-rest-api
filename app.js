@@ -7,7 +7,7 @@ import "dotenv/config";
 
 import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
-import { avatarPathFrom, avatarPathTo } from "./multer/userAvatars.js";
+import { avatarPathFrom, avatarPathTo } from "./multer/avatar.js";
 import createFolderIsNotExist from "./utils/createFolderIsNotExist.js";
 import "./utils/Strategy.js";
 import avatarRouter from "./routes/avatarRouter.js";

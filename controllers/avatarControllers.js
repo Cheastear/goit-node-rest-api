@@ -1,8 +1,9 @@
 import path from "path";
 
 import { avatarPath } from "../multer/avatar.js";
-import { isExist, removeFile, rename } from "../services/avatarSchemas.js";
+import { isExist, removeFile, rename } from "../services/avatarServices.js";
 import ApiError from "../utils/ApiError.js";
+import { getById } from "../services/usersServices.js";
 
 export const postAvatar = async (req, res) => {
   const { path: temporaryName, originalname } = req.file;
@@ -21,6 +22,10 @@ export const getAvatar = async (req, res) => {
   const filePath = path.join(avatarPath, fileName);
 
   if (!(await isExist(filePath))) throw new ApiError(404, "File not found");
+
+  const user = await getById({ id: req.user._id });
+
+  if (fileName !== user.avatarURL) throw new ApiError(404, "User incorrect");
 
   res.download(filePath);
 };

@@ -10,7 +10,7 @@ import {
   uploadAvatar,
 } from "../controllers/usersControllers.js";
 import verifyToken from "../utils/verifyToken.js";
-import userAvatars from "../multer/userAvatars.js";
+import avatar from "../multer/avatar.js";
 
 const usersRouter = express.Router();
 
@@ -27,7 +27,7 @@ usersRouter.patch("/", verifyToken, asyncTryCatchWrapper(subscription));
 usersRouter.patch(
   "/avatars",
   verifyToken,
-  userAvatars.single("avatar"),
+  avatar.single("avatar"),
   asyncTryCatchWrapper(uploadAvatar)
 );
 

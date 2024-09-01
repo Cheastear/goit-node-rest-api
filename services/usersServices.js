@@ -1,4 +1,4 @@
-import User from "../schemas/userSchema.js";
+import User from "../models/userSchema.js";
 
 export const getById = async ({ id }) => {
   return await User.findOne(id);

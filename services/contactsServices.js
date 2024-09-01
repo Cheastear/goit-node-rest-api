@@ -1,4 +1,4 @@
-import Contact from "../schemas/requestSchema.js";
+import Contact from "../models/requestSchema.js";
 
 export async function getCountDocuments(query) {
   return await Contact.countDocuments(query);

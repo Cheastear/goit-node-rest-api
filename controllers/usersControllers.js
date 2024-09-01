@@ -13,8 +13,8 @@ import {
 } from "../services/usersServices.js";
 import ApiError from "../utils/ApiError.js";
 import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
-import { avatarPathTo } from "../multer/userAvatars.js";
-import { rename } from "../services/avatarSchemas.js";
+import { avatarPathTo } from "../multer/avatar.js";
+import { rename } from "../services/avatarServices.js";
 
 export const register = async (req, res) => {
   const { password, email } = req.body;

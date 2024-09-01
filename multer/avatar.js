@@ -1,7 +1,8 @@
 import multer from "multer";
 import path from "path";
 
-export const avatarPath = path.join(process.cwd(), "/public/avatars");
+export const avatarPathFrom = path.join(process.cwd(), "/tmp");
+export const avatarPathTo = path.join(process.cwd(), "/public/avatars");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

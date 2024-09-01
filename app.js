@@ -28,9 +28,8 @@ app.use((_, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const { status, statusCode, message = "Server error" } = err;
-  const finalStatus = status ? status : statusCode ? statusCode : 500;
-  res.status(finalStatus).json({ message });
+  const { status, message = "Server error" } = err;
+  res.status(status ? status : 500).json({ message });
 });
 
 const PORT = process.env.PORT || 3001;

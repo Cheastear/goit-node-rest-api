@@ -11,7 +11,7 @@ ARG NODE_VERSION=20.15.1
 FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 
 WORKDIR /app
@@ -23,10 +23,8 @@ WORKDIR /app
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
-
-
-RUN npm install --production
+    npm ci --omit=dev \
+    npm install --production
 
 # Run the application as a non-root user.
 USER node
@@ -38,4 +36,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the application.
-CMD node ./app.js
+CMD ["node", "./app.js"]

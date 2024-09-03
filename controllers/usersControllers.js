@@ -45,10 +45,10 @@ export const register = async (req, res) => {
   if (newUser === null) throw new ApiError(500, "Database error");
 
   const msg = {
-    to: user.email,
+    to: newUser.email,
     from: process.env.API_EMAIL,
     subject: "Verifing email",
-    text: `Veryfy code: ${user.verificationToken}`,
+    text: `Veryfy code: ${newUser.verificationToken}`,
   };
 
   sg.send(msg)

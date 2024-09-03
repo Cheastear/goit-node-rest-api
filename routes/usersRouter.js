@@ -8,6 +8,8 @@ import {
   current,
   subscription,
   uploadAvatar,
+  verificationRequest,
+  sendVerify,
 } from "../controllers/usersControllers.js";
 import verifyToken from "../utils/verifyToken.js";
 import avatar from "../multer/avatar.js";
@@ -30,5 +32,11 @@ usersRouter.patch(
   avatar.single("avatar"),
   asyncTryCatchWrapper(uploadAvatar)
 );
+
+usersRouter.get(
+  "/verify/:verificationToken",
+  asyncTryCatchWrapper(verificationRequest)
+);
+usersRouter.post("/verify", asyncTryCatchWrapper(sendVerify));
 
 export default usersRouter;

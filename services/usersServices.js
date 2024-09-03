@@ -8,8 +8,18 @@ export const getByEmail = async ({ email }) => {
   return await User.findOne({ email: email });
 };
 
-export const addUser = async ({ email, hashedPassword, avatarURL }) => {
-  return await User.create({ email, password: hashedPassword, avatarURL });
+export const addUser = async ({
+  email,
+  hashedPassword,
+  avatarURL,
+  verificationToken,
+}) => {
+  return await User.create({
+    email,
+    password: hashedPassword,
+    avatarURL,
+    verificationToken,
+  });
 };
 
 export const addToken = async ({ id, token }) => {
@@ -26,4 +36,15 @@ export const subscriptionUpdate = async ({ id, subscription }) => {
     { subscription },
     { new: true }
   );
+};
+
+export const getByVerifyToken = async ({ verificationToken }) => {
+  return await User.findOne({ verificationToken: verificationToken });
+};
+
+export const setVeryfyToken = async ({ id, verify, verificationToken }) => {
+  return await User.findByIdAndUpdate(id, {
+    verify,
+    verificationToken,
+  });
 };

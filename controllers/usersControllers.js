@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
 import path from "path";
+import { v4 } from "uuid";
+import sg from "@sendgrid/mail";
 
 import { userValidator } from "../schemas/userValidateSchema.js";
 import {
@@ -8,13 +10,17 @@ import {
   addUser,
   getByEmail,
   getById,
+  getByVerifyToken,
   removeToken,
+  setVeryfyToken,
   subscriptionUpdate,
 } from "../services/usersServices.js";
 import ApiError from "../utils/ApiError.js";
 import { passwordHash, passwordVerify } from "../utils/passwordHashVerify.js";
 import { avatarPathTo } from "../multer/avatar.js";
 import { rename } from "../services/avatarServices.js";
+
+sg.setApiKey(process.env.API_SENDGRID_KEY);
 
 export const register = async (req, res) => {
   const { password, email } = req.body;
@@ -33,27 +39,23 @@ export const register = async (req, res) => {
     email,
     hashedPassword: await passwordHash(password),
     avatarURL: avatarFileName,
+    verificationToken: v4(),
   });
 
   if (newUser === null) throw new ApiError(500, "Database error");
 
-  const token = jwt.sign(
-    { id: newUser._id, email: newUser.email },
-    process.env.SECRET,
-    {
-      expiresIn: "1h",
-    }
-  );
+  const msg = {
+    to: user.email,
+    from: process.env.API_EMAIL,
+    subject: "Verifing email",
+    text: `Veryfy code: ${user.verificationToken}`,
+  };
 
-  await addToken({ id: newUser._id, token });
+  sg.send(msg)
+    .then(() => console.log("Veryfication token is send"))
+    .catch((err) => console.error(err));
 
-  res.status(201).json({
-    token,
-    user: {
-      email: newUser.email,
-      subscription: newUser.subscription,
-    },
-  });
+  res.status(201).json({ message: "Register succesfull" });
 };
 
 export const login = async (req, res) => {
@@ -62,6 +64,8 @@ export const login = async (req, res) => {
   await userValidator(req.body);
 
   const user = await getByEmail({ email });
+
+  if (!user.verify) throw new ApiError(400, "Email is not verificated");
 
   if (user === null) throw new ApiError(401, "Email or password is wrong");
 
@@ -137,4 +141,48 @@ export const uploadAvatar = async (req, res) => {
   rename(temporaryName, fileName);
 
   res.status(200).json({ avatarURL: path.join("/avatars/", user.avatarURL) });
+};
+
+export const verificationRequest = async (req, res) => {
+  const { verificationToken } = req.params;
+
+  const user = await getByVerifyToken({ verificationToken });
+  if (!user) throw new ApiError(404, "User not found");
+
+  const verifyUser = await setVeryfyToken({
+    id: user.id,
+    verify: true,
+    verificationToken: null,
+  });
+  if (!verifyUser) throw new ApiError(500, "Server error");
+
+  res.status(200).json({ message: "Verification successful" });
+};
+
+export const sendVerify = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) throw new ApiError(400, "Missing required field email");
+
+  const user = await getByEmail({ email });
+
+  if (!user) throw new ApiError(404, "User not found");
+
+  if (user.verify)
+    throw new ApiError(400, "Verification has already been passed");
+
+  const msg = {
+    to: user.email,
+    from: process.env.API_EMAIL,
+    subject: "Verifing email",
+    text: `Veryfy code: ${user.verificationToken}`,
+  };
+
+  sg.send(msg)
+    .then(() => console.log("Veryfication token is send"))
+    .catch((err) => console.error(err));
+
+  await setVeryfyToken({ email, verify: false, verificationToken: v4() });
+
+  res.status(200).json({ message: "Verification email send" });
 };

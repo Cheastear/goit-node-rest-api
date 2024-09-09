@@ -15,9 +15,11 @@ import avatarRouter from "./routes/avatarRouter.js";
 const app = express();
 
 app.use(passport.initialize());
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(process.cwd()));
 
 app.use("/", avatarRouter);
 app.use("/api/users", usersRouter);
@@ -32,7 +34,7 @@ app.use((err, req, res, next) => {
   res.status(status ? status : 500).json({ message });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const uriDb = process.env.DB_HOST;
 
 const connection = mongoose.connect(uriDb);
@@ -41,7 +43,7 @@ connection
     console.log("Database connection successful");
     createFolderIsNotExist(avatarPathFrom);
     createFolderIsNotExist(avatarPathTo);
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server is running. Use our API on port: ${PORT}`);
     });
   })

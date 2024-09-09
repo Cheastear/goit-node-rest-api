@@ -6,7 +6,7 @@ export const avatarPathTo = path.join(process.cwd(), "/public/avatars");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, avatarPath);
+    cb(null, avatarPathFrom);
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
